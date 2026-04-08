@@ -1,0 +1,69 @@
+/**
+ * Any CSS included here will be global.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  --ifm-color-primary: #3b82f6;
+  --ifm-color-primary-dark: #2563eb;
+  --ifm-color-primary-darker: #1d4ed8;
+  --ifm-color-primary-darkest: #1e40af;
+  --ifm-color-primary-light: #60a5fa;
+  --ifm-color-primary-lighter: #93c5fd;
+  --ifm-color-primary-lightest: #bfdbfe;
+  --ifm-font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
+  --ifm-heading-font-family: 'Outfit', sans-serif;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #60a5fa;
+  --ifm-color-primary-dark: #3b82f6;
+  --ifm-color-primary-darker: #2563eb;
+  --ifm-color-primary-darkest: #1d4ed8;
+  --ifm-color-primary-light: #93c5fd;
+  --ifm-color-primary-lighter: #bfdbfe;
+  --ifm-color-primary-lightest: #dbeafe;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
+  --ifm-background-color: #0f172a;
+}
+
+.navbar {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='dark'] .navbar {
+  background: rgba(15, 23, 42, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer {
+  --ifm-footer-background-color: #0f172a;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Custom styling for note sections */
+.theme-doc-markdown header h1 {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+code {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--ifm-color-primary);
+  border-radius: 4px;
+}
+
+.markdown blockquote {
+  border-left-color: var(--ifm-color-primary);
+  background-color: rgba(59, 130, 246, 0.05);
+  border-radius: 4px;
+}
