@@ -1,69 +1,144 @@
 /**
- * Any CSS included here will be global.
+ * FDSheet Custom CSS
+ * Theme: Earth-Tone Premium SaaS
  */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
 
 :root {
-  --ifm-color-primary: #3b82f6;
-  --ifm-color-primary-dark: #2563eb;
-  --ifm-color-primary-darker: #1d4ed8;
-  --ifm-color-primary-darkest: #1e40af;
-  --ifm-color-primary-light: #60a5fa;
-  --ifm-color-primary-lighter: #93c5fd;
-  --ifm-color-primary-lightest: #bfdbfe;
   --ifm-font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
-  --ifm-heading-font-family: 'Outfit', sans-serif;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-heading-font-family: 'Inter', sans-serif;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+@supports (font-variation-settings: normal) {
+  :root { 
+    --ifm-font-family-base: 'InterVariable', system-ui, -apple-system, sans-serif;
+    --ifm-heading-font-family: 'InterVariable', sans-serif;
+  }
+}
+
+/* Color Palette Variables */
+:root {
+  --cocoa: #442D1C;
+  --wine: #743014;
+  --caramel: #84592B;
+  --olive: #9D9167;
+  --batter: #E8D1A7;
+
+  --ifm-color-primary: var(--caramel);
+  --ifm-color-primary-dark: #6e4a23;
+  --ifm-color-primary-darker: #63431f;
+  --ifm-color-primary-darkest: #4f3619;
+  --ifm-color-primary-light: #946938;
+  --ifm-color-primary-lighter: #9c7140;
+  --ifm-color-primary-lightest: #b38855;
+
+  /* Force background colors */
+  --ifm-background-color: #faf9f6; /* Off-white for light mode */
+  --ifm-navbar-background-color: rgba(250, 249, 246, 0.85); /* Off-white */
+  --ifm-footer-background-color: #faf9f6;
+  
+  --ifm-text-color: var(--cocoa);
+  --ifm-heading-color: var(--cocoa);
+  
+  --ifm-navbar-link-hover-color: var(--wine);
+  --ifm-menu-color: var(--cocoa);
+  --ifm-menu-color-active: var(--wine);
+  
+  --docusaurus-highlighted-code-line-bg: rgba(132, 89, 43, 0.1);
 }
 
 [data-theme='dark'] {
-  --ifm-color-primary: #60a5fa;
-  --ifm-color-primary-dark: #3b82f6;
-  --ifm-color-primary-darker: #2563eb;
-  --ifm-color-primary-darkest: #1d4ed8;
-  --ifm-color-primary-light: #93c5fd;
-  --ifm-color-primary-lighter: #bfdbfe;
-  --ifm-color-primary-lightest: #dbeafe;
-  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
-  --ifm-background-color: #0f172a;
+  --ifm-background-color: #12100e; /* very dark minimal gray/brown */
+  --ifm-navbar-background-color: rgba(18, 16, 14, 0.85);
+  --ifm-footer-background-color: #12100e;
+  
+  --ifm-text-color: #e5e3e0;
+  --ifm-heading-color: #ffffff;
+  
+  --ifm-color-primary: var(--batter);
+  --ifm-color-primary-dark: #d8c196;
+  --ifm-color-primary-darker: #ccb68d;
+  --ifm-color-primary-darkest: #b5a17d;
+  --ifm-color-primary-light: #f5e4c3;
+  --ifm-color-primary-lighter: #f9ecd1;
+  --ifm-color-primary-lightest: #fff4e0;
+
+  --ifm-navbar-link-hover-color: var(--batter);
+  --ifm-menu-color: #e5e3e0;
+  --ifm-menu-color-active: var(--batter);
+
+  --docusaurus-highlighted-code-line-bg: rgba(232, 209, 167, 0.1);
 }
 
+/* Minimal Layout Styling (SaaS Feel) */
 .navbar {
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(132, 89, 43, 0.1);
+  box-shadow: none;
 }
 
 [data-theme='dark'] .navbar {
-  background: rgba(15, 23, 42, 0.8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(232, 209, 167, 0.1);
 }
 
 .footer {
-  --ifm-footer-background-color: #0f172a;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(132, 89, 43, 0.1);
+  padding: 1.5rem 0;
+}
+[data-theme='dark'] .footer {
+  border-top: 1px solid rgba(232, 209, 167, 0.1);
 }
 
-/* Custom styling for note sections */
-.theme-doc-markdown header h1 {
-  font-weight: 700;
-  letter-spacing: -0.025em;
+h1 { font-weight: 800; letter-spacing: -0.03em; }
+h2 { font-weight: 700; letter-spacing: -0.02em; }
+h3 { font-weight: 600; letter-spacing: -0.01em; }
+
+/* Custom "Key Idea" & Admonitions */
+.theme-admonition {
+  border: 1px solid rgba(132, 89, 43, 0.2);
+  border-radius: 8px;
+  background-color: rgba(132, 89, 43, 0.03);
+  box-shadow: none;
 }
 
-summary {
-  font-weight: 600;
-  cursor: pointer;
+[data-theme='dark'] .theme-admonition {
+  border: 1px solid rgba(232, 209, 167, 0.2);
+  background-color: rgba(232, 209, 167, 0.05);
 }
 
-code {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: var(--ifm-color-primary);
-  border-radius: 4px;
+.theme-admonition-info {
+  border-left-color: var(--caramel);
 }
 
-.markdown blockquote {
-  border-left-color: var(--ifm-color-primary);
-  background-color: rgba(59, 130, 246, 0.05);
-  border-radius: 4px;
+[data-theme='dark'] .theme-admonition-info {
+  border-left-color: var(--batter);
+}
+
+.theme-admonition-tip {
+  border-left-color: var(--olive);
+}
+
+/* Beautiful Code Blocks */
+.prismjs.prismjs {
+  border-radius: 8px;
+  border: 1px solid rgba(132, 89, 43, 0.1);
+}
+
+[data-theme='dark'] .prismjs.prismjs {
+  border: 1px solid rgba(232, 209, 167, 0.1);
+  background: #1a1816;
+}
+
+/* Sidebar styling */
+.menu__link {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.menu__link:hover {
+  background: rgba(132, 89, 43, 0.05);
+}
+
+[data-theme='dark'] .menu__link:hover {
+  background: rgba(232, 209, 167, 0.05);
 }
