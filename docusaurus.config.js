@@ -14,6 +14,15 @@ const config = {
   tagline: 'Frontend Engineering & Design Documentation',
   favicon: 'img/favicon.ico',
 
+  plugins: [
+    [
+      require.resolve("@easyops-cn/docusaurus-search-local"),
+      {
+        hashed: true,
+      },
+    ],
+  ],
+
   stylesheets: [
     {
       href: 'https://rsms.me/inter/inter.css',
@@ -78,7 +87,8 @@ const config = {
       image: 'img/docusaurus-social-card.jpg',
       colorMode: {
         defaultMode: 'dark',
-        respectPrefersColorScheme: true,
+        disableSwitch: true,
+        respectPrefersColorScheme: false,
       },
       navbar: {
         title: 'FDSheet',
@@ -99,11 +109,6 @@ const config = {
             position: 'right',
           },
         ],
-      },
-      footer: {
-        style: 'dark',
-        links: [],
-        copyright: `Copyright © ${new Date().getFullYear()} FDSheet. Master Modern Frontend.`,
       },
       prism: {
         theme: prismThemes.github,

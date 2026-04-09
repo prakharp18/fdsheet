@@ -4,18 +4,10 @@ Welcome to **FDSheet**, a highly detailed collection of Frontend Engineering not
 
 This documentation is designed to take you from beginner to advanced concepts with deep dives, real-world examples, and visual diagrams.
 
-## Topics Covered
+---
 
-### [Rendering Patterns](./frontend/hydration.md)
-Explore how modern frameworks bridge the gap between server and client.
+## Make Contributions
 
-- [Hydration](./frontend/hydration.md)
-- [Partial Hydration](./frontend/partial-hydration.md)
-- [Islands Architecture](./frontend/islands-architecture.md)
+This is an open-source project designed to centralize high-quality frontend knowledge. All contributions are welcome! If you want to add new topics, fix errors, or improve code examples, please submit a pull request on my GitHub repository.
 
-## How to use these notes
-Each topic follows a structured format:
-1. **Definition**: Simple explanation.
-2. **Deep Dive**: Internal workings and mechanics.
-3. **Diagrams**: Mermaid visualizations.
-4. **Insights**: Interview questions and common pitfalls.
+> Built by [pizzat](https://pizzat25.vercel.app/)
