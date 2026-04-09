@@ -19,6 +19,7 @@ const config = {
       require.resolve("@easyops-cn/docusaurus-search-local"),
       {
         hashed: true,
+        docsRouteBasePath: '/',
       },
     ],
   ],
@@ -70,6 +71,7 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          routeBasePath: '/',
           sidebarPath: './sidebars.js',
         },
         blog: false,
@@ -91,24 +93,7 @@ const config = {
         respectPrefersColorScheme: false,
       },
       navbar: {
-        title: 'FDSheet',
-        logo: {
-          alt: 'FDSheet Logo',
-          src: 'img/logo.svg',
-        },
-        items: [
-          {
-            type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
-            position: 'left',
-            label: 'Notes',
-          },
-          {
-            href: 'https://github.com/prakharp18/fdsheet',
-            label: 'GitHub',
-            position: 'right',
-          },
-        ],
+        items: [],
       },
       prism: {
         theme: prismThemes.github,

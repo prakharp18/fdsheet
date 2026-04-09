@@ -1,3 +1,6 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Islands Architecture (Deep Dive)
 
 Islands Architecture is a rendering paradigm that encourages the creation of small, entirely isolated interactive components—called "Islands"—within an otherwise completely static, zero-JavaScript HTML shell.
@@ -46,6 +49,9 @@ graph TD
 
 Unlike Next.js App Router (which uses `'use client'`), Astro uses HTML compilation directives directly on the instances of the components.
 
+<Tabs groupId="lang" queryString>
+<TabItem value="js" label="JavaScript">
+
 ```javascript
 // pages/index.astro
 import Layout from '../layouts/Layout.astro';
@@ -65,6 +71,31 @@ import HeavyChart from '../components/HeavyChart.svelte';
 </Layout>
 ```
 
+</TabItem>
+<TabItem value="ts" label="TypeScript">
+
+```typescript
+// pages/index.astro
+import Layout from '../layouts/Layout.astro';
+import StaticHeader from '../components/StaticHeader.tsx';
+import InteractiveCounter from '../components/Counter.tsx';
+import HeavyChart from '../components/HeavyChart.svelte';
+
+<Layout title="Dashboard">
+  {/* This is rendered to HTML. Zero React runtime is sent to the client. */}
+  <StaticHeader />
+
+  {/* Hydrates immediately. React runtime is loaded. */}
+  <InteractiveCounter client:load initialCount={0} />
+
+  {/* Hydrates ONLY when the user scrolls the chart into the Viewport! Svelte runtime loaded. */}
+  <HeavyChart client:visible dataUrl="/api/v1/stats" />
+</Layout>
+```
+
+</TabItem>
+</Tabs>
+
 :::tip[Architectural Superpower: Framework Agnostic]
 Because the Islands are completely isolated and root hydration is split, you can trivially mount a Vue island and a React island on the exact same page without conflict. The base HTML acts as the unifying shell.
 :::
@@ -76,6 +107,9 @@ Because the Islands are completely isolated and root hydration is split, you can
 The primary architectural hurdle of Islands is shared state. Since multiple reactive components are separated entirely in the DOM tree and might run different virtual runtimes, standard context (`React.createContext`) fails.
 
 You must solve this via **Nano Stores** or native generic events:
+
+<Tabs groupId="lang" queryString>
+<TabItem value="js" label="JavaScript">
 
 ```javascript
 // store.js - Using Nano Stores (Framework agnostic state)
@@ -95,20 +129,29 @@ export function CartIcon() {
 }
 ```
 
+</TabItem>
+<TabItem value="ts" label="TypeScript">
+
 ```typescript
-// AddToCart.vue (Island B - Vue)
-<script setup>
-import { useStore } from '@nanostores/vue';
+// store.ts - Using Nano Stores (Framework agnostic state)
+import { atom } from 'nanostores';
+
+export const isCartOpen = atom<boolean>(false);
+```
+
+```typescript
+// CartIcon.tsx (Island A - React)
+import { useStore } from '@nanostores/react';
 import { isCartOpen } from '../store';
 
-const open = useStore(isCartOpen);
-const toggle = () => isCartOpen.set(!open.value);
-</script>
-
-<template>
-  <button @click="toggle">Toggle Cart</button>
-</template>
+export function CartIcon() {
+  const open = useStore(isCartOpen);
+  return <div className={open ? 'active' : ''}>Cart</div>;
+}
 ```
+
+</TabItem>
+</Tabs>
 
 ---
 

@@ -1,3 +1,6 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Hydration (Deep Dive)
 
 Hydration is the mechanism by which a modern JavaScript framework (like React, Vue, or Solid) attaches event listeners and instantiates state on a static, server-rendered DOM tree without recreating the DOM nodes from scratch.
@@ -39,7 +42,8 @@ sequenceDiagram
 
 ## 2. Server vs Client Code Execution
 
-### JavaScript (Node.js / React)
+<Tabs groupId="lang" queryString>
+<TabItem value="js" label="JavaScript">
 
 ```javascript
 // Server-Side: Generating the initial "Dry" HTML string
@@ -57,21 +61,55 @@ export function handleRequest(req, res) {
     </html>
   `);
 }
-```
 
+// ==============
 
-```javascript
 // Client-Side: Bootstrapping and Hydrating
 import { hydrateRoot } from 'react-dom/client';
 import { App } from './App';
 
-// hydrateRoot EXPECTS the DOM to perfectly match <App /> output
 const rootNode = document.getElementById('root');
 
 if (rootNode) {
   hydrateRoot(rootNode, <App />);
 }
 ```
+
+</TabItem>
+<TabItem value="ts" label="TypeScript">
+
+```typescript
+// Server-Side: Generating the initial "Dry" HTML string
+import { renderToString } from 'react-dom/server';
+import { App } from './App';
+
+export function handleRequest(req: Request, res: Response) {
+  const htmlString = renderToString(<App />);
+  res.send(`
+    <html>
+      <body>
+        <div id="root">${htmlString}</div>
+        <script src="/client-bundle.js"></script>
+      </body>
+    </html>
+  `);
+}
+
+// ==============
+
+// Client-Side: Bootstrapping and Hydrating
+import { hydrateRoot } from 'react-dom/client';
+import { App } from './App';
+
+const rootNode = document.getElementById('root');
+
+if (rootNode) {
+  hydrateRoot(rootNode, <App />);
+}
+```
+
+</TabItem>
+</Tabs>
 
 ---
 
@@ -86,6 +124,10 @@ A Mismatch occurs when the Server HTML output and the initial Client Virtual DOM
 
 :::tip[How to fix random data mismatches]
 Wait until hydration completes (via `useEffect`) to update the DOM with dynamic data.
+
+<Tabs groupId="lang" queryString>
+<TabItem value="js" label="JavaScript">
+
 ```javascript
 import { useState, useEffect } from 'react';
 
@@ -97,10 +139,30 @@ function ClientDate() {
     setDate(new Date().toLocaleTimeString());
   }, []);
 
-  // Server and Initial Client render both output generic fallback
   return <div>{date ?? 'Loading time...'}</div>;
 }
 ```
+
+</TabItem>
+<TabItem value="ts" label="TypeScript">
+
+```typescript
+import { useState, useEffect } from 'react';
+
+function ClientDate() {
+  const [date, setDate] = useState<string | null>(null);
+
+  useEffect(() => {
+    // This only runs ON THE CLIENT after hydration
+    setDate(new Date().toLocaleTimeString());
+  }, []);
+
+  return <div>{date ?? 'Loading time...'}</div>;
+}
+```
+
+</TabItem>
+</Tabs>
 :::
 
 ---

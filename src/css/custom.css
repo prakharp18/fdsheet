@@ -96,3 +96,103 @@ h3 { font-weight: 600; letter-spacing: -0.02em; }
   border: 1px solid #333 !important;
   color: #FFF !important;
 }
+
+.searchBox_node_modules-\@easyops-cn-docusaurus-search-local-dist-client-client-theme-SearchBar-styles-module:hover,
+.searchBox_node_modules-\@easyops-cn-docusaurus-search-local-dist-client-client-theme-SearchBar-styles-module:focus-within {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+.searchBox_node_modules-\@easyops-cn-docusaurus-search-local-dist-client-client-theme-SearchBar-styles-module input {
+  color: inherit !important;
+}
+
+/* Tab Styling Overrides */
+.tabs {
+  border-bottom: 1px solid #333333;
+}
+
+.tabs__item {
+  color: #888888;
+  font-weight: 500;
+}
+
+.tabs__item:hover {
+  background: #111111;
+  color: #FFFFFF;
+}
+
+.tabs__item--active {
+  color: #FFFFFF;
+  border-bottom-color: #FFFFFF;
+}
+
+/* Responsive Navbar & Floating Search */
+@media (min-width: 997px) {
+  :root {
+    --ifm-navbar-height: 0px;
+  }
+  .navbar {
+    background: transparent !important;
+    border: none !important;
+    pointer-events: none;
+  }
+  .navbar__inner {
+    display: block;
+  }
+  .navbar__items {
+    display: none !important;
+  }
+  .navbar__items--right {
+    display: flex !important;
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    pointer-events: auto;
+    z-index: 100;
+  }
+
+  /* Force search results dropdown to open UPWARD */
+  html[data-theme="dark"] .navbar__items--right ul,
+  html[data-theme="dark"] .navbar__items--right [class*="searchResultsColumn"],
+  html[data-theme="dark"] .navbar__items--right [class*="dropdownMenu"] {
+    bottom: 100% !important;
+    top: auto !important;
+    margin-bottom: 0.5rem;
+    background-color: #000000 !important;
+    border: 1px solid #333 !important;
+  }
+
+  /* Set general text color for un-hovered items */
+  html[data-theme="dark"] .navbar__items--right [class*="suggestion"] {
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+  }
+  
+  html[data-theme="dark"] .navbar__items--right [class*="suggestion"] * {
+    color: #FFFFFF !important;
+  }
+
+  /* Fix Hover/Cursor Visibility: Black text on White background */
+  html[data-theme="dark"] .navbar__items--right [class*="suggestion"][class*="cursor"] {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+
+  /* Make sure all child elements of the hovered item turn black so text is readable */
+  html[data-theme="dark"] .navbar__items--right [class*="suggestion"][class*="cursor"] * {
+    color: #000000 !important;
+    background: transparent !important;
+  }
+
+  /* Special case for matched highlight parts inside active suggestion */
+  html[data-theme="dark"] .navbar__items--right [class*="suggestion"][class*="cursor"] mark {
+    background-color: transparent !important;
+    color: #000000 !important;
+    text-decoration: underline;
+    font-weight: 900;
+  }
+}
+
+
+

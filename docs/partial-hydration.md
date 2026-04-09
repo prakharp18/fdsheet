@@ -1,3 +1,6 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Partial Hydration (Selective Hydration)
 
 Partial Hydration (or Selective Hydration in React 18 terminology) is an advanced rendering optimization where only specific, interactive portions of a server-rendered page are hydrated, deferring or outright eliminating the evaluation of non-interactive JavaScript.
@@ -22,6 +25,10 @@ In React 18, this is heavily coupled with `Suspense`. When React hydrates a page
 
 ```mermaid
 graph TD
+    classDef static fill:#050505,stroke:#333,stroke-width:1px,color:#888
+    classDef dynamic fill:#FFFFFF,stroke:#FFF,stroke-width:2px,color:#000
+    classDef suspense stroke-dasharray: 5 5,stroke:#CCC
+
     subgraph "Standard Top-Down Hydration"
         A[Root] --> B[Navbar]
         A --> C[Static Banner]
@@ -29,28 +36,27 @@ graph TD
     end
 
     subgraph "Selective Hydration (React 18)"
-        R[Root] --> N[Navbar - Hydrated Fast]
-        R --> S[Static Banner - Skipped]
-        R -.-> Susp[Suspense Boundary - Deferred]
-        Susp -.-> DC[Data Chart - Hydrated on demand]
+        R[Root] --> N[Navbar - Hydrated Fast]:::dynamic
+        R --> S[Static Banner - Skipped]:::static
+        R -.-> Susp[Suspense Boundary - Deferred]:::suspense
+        Susp -.-> DC[Data Chart - Hydrated on demand]:::dynamic
     end
-    
-    style N fill:#FFFFFF,stroke:#333,stroke-width:2px,color:#000
-    style DC fill:#FFFFFF,stroke:#333,stroke-width:2px,color:#000
-    style Susp stroke-dasharray: 5 5,stroke:#CCC
 ```
 
 ---
 
-## 2. React 18 Implementation (TypeScript)
+## 2. React 18 Implementation
 
 If you load a page heavily dependent on data, you can wrap expensive components in `<Suspense>`. React will render the fallback HTML on the server. On the client, it will hydrate the lightweight components first.
+
+<Tabs groupId="lang" queryString>
+<TabItem value="js" label="JavaScript">
 
 ```javascript
 import { Suspense, lazy } from 'react';
 
 // Main bundle does not include HeavyChart
-const HeavyChart = lazy(() => import('./components/HeavyChart'));
+const HeavyChart = lazy(() => import('./components/HeavyChart.jsx'));
 
 export default function Dashboard() {
   return (
@@ -70,6 +76,37 @@ export default function Dashboard() {
   );
 }
 ```
+
+</TabItem>
+<TabItem value="ts" label="TypeScript">
+
+```typescript
+import { Suspense, lazy, ReactElement } from 'react';
+
+// Main bundle does not include HeavyChart
+const HeavyChart = lazy(() => import('./components/HeavyChart.tsx'));
+
+export default function Dashboard(): ReactElement {
+  return (
+    <div className="layout">
+      {/* Navbar hydrates immediately, user can click links */}
+      <Navigation />
+      
+      <main>
+        <h1>Performance Stats</h1>
+        
+        {/* React defers hydration of this tree */}
+        <Suspense fallback={<div className="skeleton">Loading visuals...</div>}>
+          <HeavyChart dataset="q1" />
+        </Suspense>
+      </main>
+    </div>
+  );
+}
+```
+
+</TabItem>
+</Tabs>
 
 :::warning[The React 18 "Prioritization" Feature]
 If `HeavyChart` is loading in the background, but the user rapidly clicks on `Navigation`, React 18's event system detects this and *elevates* the hydration priority of the Navigation component specifically, pausing everything else.
