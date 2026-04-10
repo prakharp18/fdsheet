@@ -9,98 +9,103 @@ import TabItem from '@theme/TabItem';
 
 # Immutable Data Patterns
 
-In modern frontend architecture (especially inside frameworks like React or state machines like Redux), **Immutability** is a foundational rule.
+In modern frontend architecture, **Immutability** is not just a preference—it's a requirement for predictable state change detection and performance.
 
-Immutability means that once a data structure is created, it cannot be changed. To modify the structure, you must create a new copy with the updated values.
+:::info[Core Philosophy]
+**Data as a Snapshot**. Instead of modifying an existing object in memory (Mutation), we treat state as a read-only series of snapshots. To "change" something, we generate a brand new snapshot.
+:::
 
-## The "Why" of Immutability
+---
 
-1. **Predictability:** State mutations create side effects that are extremely hard to track in large applications. Immutable data ensures state traces remain strictly linear.
-2. **Performance (Reference Equality):** React determines when to re-render by comparing the old state versus the new state using `Object.is`. If `prevObj === nextObj` evaluates to `false`, React knows it needs to re-render. If data was forcefully mutated inside the old object, React has no cheap way of detecting the change.
-3. **Time Travel Debugging:** Tools like the Redux DevTools can easily rewind application state because previous snapshots of state aren't destroyed.
+## 1. Mutation vs. Immutability
 
-## Vanilla JavaScript Patterns
+When you mutate an object, the reference (pointer) remains the same. The computer knows the *content* changed, but it has to traverse the entire object to find out *what* changed.
 
-The majority of immutable updates in React can be done natively using ES6 syntax.
+```mermaid
+graph LR
+    subgraph "Mutation (In-place)"
+    Obj1["Memory: 0x123"] -- "obj.a = 2" --> Obj1
+    end
+    
+    subgraph "Immutability (Copy-on-write)"
+    Obj2["Memory: 0x456"] -- "newObj = {...}" --> Obj3["Memory: 0x789"]
+    end
+```
 
-### Updating Objects (Spread Operator)
+---
+
+## 2. Patterns for Common Operations
+
+Efficiently updating state requires moving away from methods that mutate (`push`, `pop`, `splice`) toward those that return new instances (`map`, `filter`, `slice`, `spread`).
+
+<Tabs groupId="lang" queryString>
+<TabItem value="js" label="JavaScript">
 
 ```javascript
-const user = { name: "Alice", age: 25 };
+// 1. Updating Nested Objects
+const state = { id: 1, info: { name: "React" } };
+const nextState = { ...state, info: { ...state.info, name: "Next.js" } };
 
-// BAD: Mutation
-user.age = 26; 
+// 2. Inserting in Arrays
+const items = [1, 3];
+const inserted = [...items.slice(0, 1), 2, ...items.slice(1)]; // [1, 2, 3]
 
-// GOOD: Immutable Update
-const updatedUser = {
-  ...user,
-  age: 26 
+// 3. Updating Array of Objects
+const users = [{id: 1, role: 'admin'}, {id: 2, role: 'user'}];
+const updatedUsers = users.map(u => u.id === 2 ? { ...u, role: 'admin' } : u);
+```
+
+</TabItem>
+<TabItem value="ts" label="TypeScript">
+
+```typescript
+interface User { id: number; role: string; }
+
+const promoteUser = (users: User[], targetId: number): User[] => {
+  return users.map(user => 
+    user.id === targetId 
+      ? { ...user, role: 'admin' } 
+      : user
+  );
 };
+
+// Returns a brand new array reference
 ```
 
-### Updating Arrays
+</TabItem>
+</Tabs>
 
-**Appending/Prepending:**
-```javascript
-const list = [1, 2, 3];
-// BAD: list.push(4) or list.unshift(0)
-const newList = [...list, 4]; // Append
-const prependedList = [0, ...list]; // Prepend
-```
+---
 
-**Removing items:**
-```javascript
-// Remove element at index 1
-const list = [1, 2, 3];
-// BAD: list.splice(1, 1)
-const newList = list.filter((_, index) => index !== 1);
-```
+## 3. Proxy-based Immutability (Immer)
 
-**Modifying specific items:**
-```javascript
-const list = [{id: 1, active: false}, {id: 2, active: false}];
-const newList = list.map(item => 
-  item.id === 1 ? { ...item, active: true } : item
-);
-```
-
-## The Nested Object Problem
-
-Vanilla JS `...` (spread operator) only performs a **shallow copy**. Updating deeply nested state natively becomes unreadable:
-
-```javascript
-const state = { a: { b: { c: { d: 1 } } } };
-
-// Updating 'd' native immutable way
-const newState = {
-  ...state,
-  a: {
-    ...state.a,
-    b: {
-      ...state.a.b,
-      c: {
-        ...state.a.b.c,
-        d: 2
-      }
-    }
-  }
-};
-```
-
-## Tooling: Immer & Immutable.js
-
-To avoid the verbose code above, the community uses structural sharing libraries.
-
-### Immer
-Immer allows you to write mutating logic that safely translates into an immutable update under the hood through JS Proxies. Redux Toolkit uses Immer out of the box.
+The community favorited **Immer** because it allows you to write "mutating" code inside a safe proxy wrapper.
 
 ```javascript
 import produce from "immer";
 
-const nextState = produce(state, draft => {
-  draft.a.b.c.d = 2; // Looks like a mutation, but is fully immutable!
+const baseState = [{ todo: "Learn React", done: true }];
+
+const nextState = produce(baseState, draftState => {
+    draftState.push({ todo: "Tweet about it" });
+    draftState[0].done = false;
 });
 ```
 
-### Immutable.js
-Created by Facebook, it provides its own API (`Map`, `List`) using advanced persistent data structures (Tries). While very powerful, it forces you to use unique setter/getter APIs instead of native JS objects, leading to a steep adoption curve.
+Under the hood, Immer uses the standard **JavaScript Proxy API** to track every move you make on `draftState` and then applies the equivalent immutable spread operations to produce a final `nextState`.
+
+---
+
+## 4. Interview Prep: 4 Key Questions
+
+### Q1: Why is `Object.freeze()` not enough for true immutability in React?
+**A:** `Object.freeze()` is a runtime "lock". It prevents mutation but it doesn't help you *create* the next state. Furthermore, it's shallow—it doesn't freeze nested objects. It also has a performance overhead during development.
+
+### Q2: Explain the difference between `Shallow Copy` and `Deep Copy` in the context of state updates.
+**A:** A **Shallow Copy** (spread operator) only copies the top-level references. Nested objects still point to the original memory addresses (see Structural Sharing). A **Deep Copy** duplicates the entire tree. For 99% of React apps, **Shallow Copy** is preferred because Deep Copy destroys performance and Breaks `React.memo` by changing every reference in the tree.
+
+### Q3: How does immutability enable "Time Travel Debugging"?
+**A:** Because previous states are never mutated or destroyed, Redux/State managers can simply keep an array of state snapshots. Moving "back in time" is as simple as swapping the current state pointer to a previous object in the history array.
+
+### Q4: Which Array methods should be avoided when using React state?
+**A:** Avoid `push()`, `pop()`, `shift()`, `unshift()`, `splice()`, `reverse()`, and `sort()`. These methods mutate the array in-place. If you use them, React won't see a new reference, will evaluate `oldState === newState` as **true**, and will fail to trigger a re-render.
