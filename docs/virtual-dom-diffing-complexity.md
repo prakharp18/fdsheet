@@ -12,61 +12,44 @@ import TabItem from '@theme/TabItem';
 Creating a robust UI library relies on an efficient way to calculate the difference between two states of the Virtual DOM. This calculation is the heart of **Reconciliation**.
 
 :::info[Core Philosophy]
-**Heuristic O(n) Optimization**. Theoretically, finding the minimum transformation between two trees (Tree Edit Distance) is a solved problem but is computationally explosive. React accepts some "constraints" on how web apps are built to shortcut this math.
+**Heuristic O(n) Optimization**. Finding the minimum transformation between two arbitrary trees (Tree Edit Distance) is mathematically expensive. React accepts specific "constraints" on web UI structure to shortcut this math from cubic to linear time.
 :::
 
 ---
 
-## 1. The $O(n^3)$ Dilemma
+## 1. Easy: The Problem of Tree Comparison
 
-In pure computer science, the problem of transforming one tree into another is known as **Tree Edit Distance**. The state-of-the-art algorithms (like the Zhang-Shasha algorithm) have a complexity of **$O(n^2)$** or **$O(n^3)$** depending on the degree of optimization.
+In computer science, comparing two trees to find the minimum number of changes (insert, delete, move) is a solved problem called **Tree Edit Distance**. 
+
+However, the state-of-the-art algorithms for this have a complexity of **$O(n^3)$**.
+
+**Why is this a failure for the Web?**
+If your page has 1,000 elements (standard for a dashboard):
+- $1,000^3$ = **1,000,000,000** (1 Billion) calculations.
+- Browsers need to render at 60fps, meaning we only have **16.6ms** per frame.
+- A mobile CPU cannot execute 1 billion comparisons in 16ms. The UI would freeze instantly.
+
+---
+
+## 2. Medium: React's $O(n)$ Heuristics
+
+To make the web fast, React makes two bold assumptions that reduce the complexity from $O(n^3)$ to **$O(n)$** (Linear Time):
+
+1.  **Different Types = Different Trees**: If a `<div>` is replaced by a `<span>`, React won't check the children. It tears down the old tree and builds a new one.
+2.  **Keys for Stability**: The developer provides a `key` prop to hint which elements are stable across renders.
 
 ```mermaid
 graph LR
-    A["Tree A (Size n)"] -- "O(n³) Algorithm" --> B["Tree B (Size n)"]
+    A["Tree A (Size n)"] -- "Heuristic O(n)" --> B["Tree B (Size n)"]
     style A fill:#fff,stroke:#333
     style B fill:#fff,stroke:#333
 ```
 
-**Why is this a failure for the Web?**
-If a page has 1,000 elements (a standard complex dashboard):
-- $1,000^3$ = **1,000,000,000** calculations.
-- At 60 frames per second, we have roughly **16.6ms** per frame.
-- A CPU cannot execute 1 billion complex object comparisons in 16ms.
-
 ---
 
-## 2. React’s Heuristic Solution
+## 3. Hard: Implementation Logic
 
-React implements a heuristic algorithm with **$O(n)$** complexity based on two assumptions:
-
-1. **Two elements of different types will produce different trees.**
-2. **The developer can hint at child stability with a `key` prop.**
-
-### Assumption 1: Element Type Stability
-If React sees a `<div>` change to a `<span>`, it doesn't bother checking the children. It assumes everything below is different. It unmounts the old tree and mounts the new one.
-
-```mermaid
-graph TD
-    subgraph "Before"
-    A[div] --> B[component]
-    end
-    subgraph "After"
-    C[section] --> D[component]
-    end
-    A -.->|Destroy| C
-    style A fill:#f96,stroke:#333,stroke-width:2px
-    style C fill:#9f6,stroke:#333,stroke-width:2px
-```
-
-### Assumption 2: The Key Prop
-Keys allow React to "trace" which elements moved. Without keys, if you insert at the top of a list, React thinks *every* item changed because the index shifted.
-
----
-
-## 3. Implementation Logic
-
-React compares nodes level-by-level (Breadth-First Search style conceptually for the diffing layer).
+React compares nodes level-by-level (Breadth-First style conceptually). It doesn't try to match a node that moved from the header to the footer; it only compares siblings at the same depth.
 
 <Tabs groupId="lang" queryString>
 <TabItem value="js" label="JavaScript">
@@ -74,16 +57,16 @@ React compares nodes level-by-level (Breadth-First Search style conceptually for
 ```javascript
 // Pseudo-code for Heuristic Diff
 function diff(oldNode, newNode) {
-  // 1. Different Types? Replace the whole thing
+  // 1. Different Types? Replace the whole subtree
   if (oldNode.type !== newNode.type) {
     return { type: 'REPLACEMENT', node: newNode };
   }
 
-  // 2. Same Type? Update attributes
+  // 2. Same Type? Update attributes in-place
   const patch = diffAttributes(oldNode.props, newNode.props);
 
   // 3. Recurse on Children (The O(n) part)
-  // Instead of all-to-all matching, we match by index/key
+  // We match children by index or key, never searching the whole tree
   const childPatches = diffChildren(oldNode.children, newNode.children);
 
   return { type: 'UPDATE', patch, childPatches };
@@ -94,18 +77,20 @@ function diff(oldNode, newNode) {
 <TabItem value="ts" label="TypeScript">
 
 ```typescript
-type NodeType = string | ComponentType;
+type NodeType = string | React.ComponentType;
+
 interface VirtualNode {
   type: NodeType;
   props: Record<string, any>;
   children: VirtualNode[];
 }
 
-function diff(oldNode: VirtualNode, newNode: VirtualNode): Patch {
+function reconcile(oldNode: VirtualNode, newNode: VirtualNode): Patch {
   if (oldNode.type !== newNode.type) {
     return { action: 'REPLACE', value: newNode };
   }
 
+  // Linear traversal of props and children
   const attrDiff = reconcileProps(oldNode.props, newNode.props);
   const childrenDiff = reconcileChildren(oldNode.children, newNode.children);
 
@@ -118,16 +103,24 @@ function diff(oldNode: VirtualNode, newNode: VirtualNode): Patch {
 
 ---
 
-## 4. Interview Prep: 4 Key Questions
+## 4. Advanced: Why $O(n^3)$ is the "True" Complexity
 
-### Q1: Why is $O(n^3)$ used for general tree diffing?
-**A:** Because it accounts for nodes moving across different levels of the tree. A node could move from the root to being a child of a distant leaf. Finding the *absolute* minimum set of operations (insert, delete, move) for any arbitrary tree requires cubic time. React ignores "moves across levels" because they are extremely rare in UIs.
+The reason general tree diffing is $O(n^3)$ is that a node could technically move anywhere. A `<span>` could move from being a child of the `<body>` to being a nested child of a `<footer>`. 
 
-### Q2: How does the `key` prop specifically lower complexity?
-**A:** Without keys, React performs a simple pairwise comparison by index ($O(n)$). If you insert at the start, every subsequent comparison fails. With keys, React uses a **Map** to look up nodes by key in $O(1)$ average time, allowing it to realize nodes just shifted, maintaining a linear $O(n)$ traversal.
+Finding the absolute minimum set of operations to account for **cross-level moves** requires comparing every node in Tree A against every node in Tree B, plus internal path calculations. React intentionally ignores cross-level moves to maintain performance, assuming that in UIs, components usually stay within their parent's context.
 
-### Q3: What happens to a component's state when its parent changes from `<div>` to `<section>`?
-**A:** The state is **destroyed**. React performs a full unmount. Even if the component itself didn't change, the fact that its parent changed type signals to React that the entire subtree is invalid and needs to be rebuilt.
+---
 
-### Q4: Does React use a Depth-First or Breadth-First search for diffing?
-**A:** React traverses the Fiber tree using a **Depth-First Search (DFS)** style (child first, then sibling, then return). However, for the *diffing logic* of children of a single node, it conceptually treats it as a level-by-level comparison to maintain $O(n)$ efficiency.
+## 5. Interview Prep: 4 Key Questions
+
+### Q1: Why did React choose $O(n)$ over a more accurate $O(n^3)$ algorithm?
+**A:** Because of the "16ms Frame Budget". Web performance requires near-instant calculations. A linear $O(n)$ algorithm scales perfectly with large UIs (10k nodes = 10k checks), whereas a cubic $O(n^3)$ algorithm would crash the browser on even moderately sized trees (100 nodes = 1 million checks).
+
+### Q2: How does the `key` prop specifically lower the complexity from $O(n^2)$ to $O(n)$ in lists?
+**A:** Without keys, React compares children by index. If you shift a list, every comparison fails, leading to quadratic-like re-renders. With keys, React uses a **Map** to look up nodes by key in **$O(1)$** time, allowing a single linear pass to identify moves, additions, and deletions.
+
+### Q3: What is the "Type Stability" assumption?
+**A:** It is the assumption that components of the same type will produce similar trees and components of different types won't. This allows React to skip deep-diffing entirely if the root tag changes (e.g., `div` to `section`), which is a massive performance shortcut.
+
+### Q4: Does React use DFS or BFS for Reconciliation?
+**A:** React traverses the Fiber tree using **Depth-First Search (DFS)** (child -> sibling -> parent). However, for the specific task of *diffing* children of a single node, it conceptually applies a level-by-level (BFS-like) logic to ensure it doesn't get lost in cross-level comparisons.

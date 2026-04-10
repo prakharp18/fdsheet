@@ -21,7 +21,6 @@ In JavaScript, understanding how the engine compares two variables is the single
 
 ### Value Equality (Primitives)
 Strings, Numbers, Booleans, Null, and Undefined are compared by **Value**.
-
 ```javascript
 const a = "hello";
 const b = "hello";
@@ -30,16 +29,15 @@ console.log(a === b); // true (The content is identical)
 
 ### Reference Equality (Complex Types)
 Objects, Arrays, and Functions are compared by **Memory Address**.
-
 ```javascript
 const list1 = [1, 2];
 const list2 = [1, 2];
-console.log(list1 === list2); // false (They live in different boxes in RAM)
+console.log(list1 === list2); // false (They live in different "boxes" in RAM)
 ```
 
 ---
 
-## 2. Intermediate: Memory Addresses & Heap
+## 2. Medium: Memory Addresses & The Heap
 
 When you create an object, JavaScript allocates a unique space in the **Heap** and gives you a "pointer" (address) to it.
 
@@ -71,7 +69,7 @@ graph TD
 
 ## 3. Hard: Referential Equality in React
 
-React uses `Object.is()` to determine if a state update should trigger a render.
+React uses `Object.is()` (a strict equality check) to determine if a state update should trigger a render.
 
 <Tabs groupId="lang" queryString>
 <TabItem value="js" label="JavaScript">
@@ -80,11 +78,11 @@ React uses `Object.is()` to determine if a state update should trigger a render.
 const [user, setUser] = useState({ name: "Alice" });
 
 // ❌ This WILL trigger a re-render
-// Even though the data is the same, { ... } creates a NEW reference.
+// Even though the data is the same, { ... } creates a NEW memory address.
 setUser({ name: "Alice" }); 
 
 // ✅ This will NOT trigger a re-render
-// React sees the reference is exactly the same, so it bails out.
+// React sees the reference is identical, so it bails out.
 setUser(user); 
 ```
 
@@ -92,9 +90,7 @@ setUser(user);
 <TabItem value="ts" label="TypeScript">
 
 ```typescript
-interface State { count: number; }
-
-const [state, setState] = useState<State>({ count: 0 });
+const [state, setState] = useState({ count: 0 });
 
 // Problem: Inline objects in render breaking children
 return (
@@ -109,25 +105,27 @@ return (
 
 ---
 
-## 4. Advanced: Object.is() vs. Strict Equality (===)
+## 4. Advanced: Object.is() Edge Cases
 
-React specifically uses `Object.is`. While it's 99% the same as `===`, there are two critical differences you must know for edge-case debugging:
+React specifically uses `Object.is`. While it's 99% the same as `===`, there are two critical differences you must know for senior-level debugging:
 
-1. **NaN**: `NaN === NaN` is `false`, but `Object.is(NaN, NaN)` is `true`.
-2. **Zero**: `+0 === -0` is `true`, but `Object.is(+0, -0)` is `false`.
+1. **NaN**: `NaN === NaN` is `false`, but `Object.is(NaN, NaN)` is **true**.
+2. **Zero**: `+0 === -0` is `true`, but `Object.is(+0, -0)` is **false**.
+
+React uses `Object.is` to ensure that if a developer accidentally sets state to `NaN`, it won't trigger an infinite loop of "changed" comparisons.
 
 ---
 
 ## 5. Interview Prep: 4 Key Questions
 
 ### Q1: Why does `{} === {}` return false?
-**A:** In JavaScript, the `{}` syntax is a constructor literal. Every time the engine encounters `{}`, it allocates a new, unique memory address in the Heap. Since `===` compares the memory addresses of objects, and these two addresses are distinct, it returns `false`.
+**A:** In JavaScript, the `{}` syntax is an object literal constructor. Every time the engine encounters `{}`, it allocates a new, unique memory address in the Heap. Since `===` compares the memory addresses of objects, and these two addresses are distinct, it returns `false`.
 
 ### Q2: How do inline arrow functions in JSX break `React.memo`?
 **A:** When you write `<Button onClick={() => handleClick()} />`, a brand new function is created in memory on every single render of the parent component. `React.memo` performs a shallow reference check on props. Since the reference of the `onClick` function changed, `React.memo` assumes the props are different and triggers a re-render of the child.
 
 ### Q3: Explain "Stability of References" in Custom Hooks.
-**A:** If a custom hook returns an object `return { data, loading }`, and that object is created inside the hook body without `useMemo`, a new object reference is returned every time. Any component using that hook will have its `useEffect` or `useMemo` dependencies triggered constantly if they depend on that returned object.
+**A:** If a custom hook returns an object `return { data, loading }`, and that object is created inside the hook body without `useMemo`, a new object reference is returned every time the hook runs. Any component using that hook will have its `useEffect` or `useMemo` dependencies triggered constantly if they depend on that returned object.
 
-### Q4: What is the most performant way to represent "Empty Data"?
-**A:** Use a **Stable Constant**. Instead of initializing state with `useState([])`, define `const EMPTY_ARRAY = []` outside your component. Using `useState(EMPTY_ARRAY)` ensures that the initial reference is shared across all instances of that component, saving memory and preventing early-effect triggers.
+### Q4: What is the most performant way to represent "Empty Data" in React?
+**A:** Use a **Stable constant**. Instead of initializing state with `useState([])`, define `const EMPTY_ARRAY = []` outside your component. Using `useState(EMPTY_ARRAY)` ensures that the initial reference is shared across all instances, saving memory and preventing early-effect triggers.
