@@ -1,6 +1,8 @@
 ---
 sidebar_position: 1
 slug: /
+description: FDSheet is a minimalist, high-contrast Hub for advanced Frontend Engineering notes, covering React architecture, performance, and best practices.
+keywords: [frontend engineering, react performance, fdsheet, frontend notes, software engineering, architecture]
 ---
 
 # Introduction

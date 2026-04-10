@@ -1,3 +1,9 @@
+---
+title: Time Slicing (Deep Dive)
+description: Learn Time Slicing in React 18 Concurrent Mode, which prevents UI blocking by splitting rendering into micro-tasks.
+keywords: ["react time slicing", "concurrent mode", "react micotasks", "ui non-blocking renders", "react performance"]
+---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 

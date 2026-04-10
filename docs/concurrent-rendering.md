@@ -1,3 +1,9 @@
+---
+title: Concurrent Rendering
+description: Deep dive into React 18 Concurrent Rendering, how it eliminates blocking renders, and alters the React runtime.
+keywords: ["react concurrent rendering", "react 18", "startTransition", "useDeferredValue", "frontend performance"]
+---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 

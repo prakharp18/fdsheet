@@ -1,3 +1,9 @@
+---
+title: Fiber Architecture
+description: An in-depth explanation of React Fiber Architecture, how it queues state updates, and executes the rendering process.
+keywords: ["react fiber", "react internal architecture", "react core algorithm", "scheduling in react"]
+---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 

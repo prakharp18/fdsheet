@@ -1,3 +1,9 @@
+---
+title: Islands Architecture (Deep Dive)
+description: Learn about Islands Architecture, a rendering paradigm for creating isolated interactive components within static HTML.
+keywords: ["islands architecture", "astro", "partial hydration", "zero javascript html", "web performance islands"]
+---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 

@@ -1,3 +1,9 @@
+---
+title: Partial Hydration (Selective Hydration)
+description: Deep dive into Partial Hydration and Selective Hydration in React 18, deferring evaluation of non-interactive JavaScript.
+keywords: ["partial hydration", "selective hydration", "react 18 suspension", "frontend hydration optimization"]
+---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 

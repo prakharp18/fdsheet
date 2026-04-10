@@ -1,3 +1,9 @@
+---
+title: Hydration (Deep Dive)
+description: Understand the mechanism of Hydration in modern JS frameworks like React and Vue, attaching event listeners to server-rendered DOM.
+keywords: ["hydration in react", "server side rendering hydration", "react ssr", "vue ssr", "frontend hydration"]
+---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 

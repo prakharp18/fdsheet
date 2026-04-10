@@ -1,3 +1,9 @@
+---
+title: Streaming SSR
+description: A detailed look at Streaming Server-Side Rendering (SSR) in React, continuous chunking, and Suspense integration.
+keywords: ["streaming ssr", "react server streaming", "suspense streaming", "next.js streaming"]
+---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 

@@ -78,6 +78,12 @@ const config = {
         theme: {
           customCss: './src/css/custom.css',
         },
+        sitemap: {
+          lastmod: 'date',
+          changefreq: 'weekly',
+          priority: 0.5,
+          filename: 'sitemap.xml',
+        },
       }),
     ],
   ],
@@ -85,6 +91,10 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      metadata: [
+        {name: 'keywords', content: 'frontend engineering, react architecture, web development, fiber architecture, concurrent rendering, hydration strategies, islands architecture, partial hydration, reconciliation algorithm, virtual dom, diffing complexity, structural sharing, immutable data patterns, performance optimization'},
+        {name: 'description', content: 'Minimalist Frontend Revision Hub - Deep dives into React architecture, performance optimization, and advanced frontend engineering concepts.'}
+      ],
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.jpg',
       colorMode: {

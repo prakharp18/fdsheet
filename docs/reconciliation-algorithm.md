@@ -1,3 +1,9 @@
+---
+title: Reconciliation Algorithm (Deep Dive)
+description: Explore the React Reconciliation Algorithm, how diffing works, and the minimal set of mutations for DOM updates.
+keywords: ["react reconciliation", "react diffing algorithm", "virtual dom diff", "react render cycle"]
+---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
