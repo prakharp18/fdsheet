@@ -92,6 +92,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       metadata: [
+        {name: 'google-site-verification', content: 'F6RN0tWbXAZzBnODrxMzpWGIcjyGYhYyzzQAPe9f3bw'},
         {name: 'keywords', content: 'frontend engineering, react architecture, web development, fiber architecture, concurrent rendering, hydration strategies, islands architecture, partial hydration, reconciliation algorithm, virtual dom, diffing complexity, structural sharing, immutable data patterns, performance optimization'},
         {name: 'description', content: 'Minimalist Frontend Revision Hub - Deep dives into React architecture, performance optimization, and advanced frontend engineering concepts.'}
       ],
