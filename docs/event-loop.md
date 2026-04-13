@@ -1,5 +1,5 @@
 ---
-title: The Event Loop
+title: Event Loop
 description: A deep dive into the JavaScript Event Loop, Macrotasks vs Microtasks, and how the browser handles rendering and execution.
 keywords: ["event loop javascript", "macrotasks", "microtasks", "task queue", "render queue", "call stack", "javascript execution model"]
 ---
